@@ -20,3 +20,6 @@ val map : ('a -> 'b) -> 'a t -> 'b t
 
 val map2 : ('a -> 'b -> 'c) -> 'a t -> 'b t -> 'c t
 (** [map2 f (x, y, z) (x', y', z')] is [(f x x', f y y', f z z')].  *)
+
+val to_tuple : 'a t -> 'a * 'a * 'a
+(** @return the triple as a standard tuple.  *)

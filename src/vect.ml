@@ -39,4 +39,4 @@ let dist2 p p' =
 
 let normalised_diff v v' = normalise (diff v v')
 
-let print v = Printf.printf "(%f, %f, %f)" (vx v) (vy v) (vz v)
+let print v = Printf.printf "vect(%f, %f, %f)" (vx v) (vy v) (vz v)

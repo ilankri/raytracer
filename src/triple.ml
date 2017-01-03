@@ -12,3 +12,5 @@ let map f t  = make (f (fst t)) (f (snd t)) (f (trd t))
 
 let map2 f t t' =
   make (f (fst t) (fst t')) (f (snd t) (snd t')) (f (trd t) (trd t'))
+
+let to_tuple t = t

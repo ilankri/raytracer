@@ -1,10 +1,24 @@
-type t = unit (* TODO *)
+type t = float Triple.t
 
-let make = fun _ -> failwith "TODO"
-let black = () (* TODO *)
-let to_bytes = fun _ -> failwith "TODO"
-let to_graphics = fun _ -> failwith "TODO"
-let add = fun _ -> failwith "TODO"
-let mult = fun _ -> failwith "TODO"
-let shift = fun _ -> failwith "TODO"
-let print = fun _ -> failwith "TODO"
+let make r g b = Triple.make r g b
+
+let black = make 0. 0. 0.
+
+(* This function leads to a precision loss because of the use of
+   int_of_float (can be improved by computing the nearest integer
+   instead).  *)
+let to_bytes c =
+  Triple.to_tuple (Triple.map (fun x -> int_of_float (ldexp x 8)) c)
+
+let to_graphics c =
+  let r, g, b = to_bytes c in
+  Graphics.rgb r g b
+
+let add c c' = Triple.map2 (+.) c c'
+
+let mult c c' = Triple.map2 ( *. ) c c'
+
+let shift k c = Triple.map (( *. ) k) c
+
+let print c =
+  Printf.printf "color(%f, %f, %f)" (Triple.fst c) (Triple.snd c) (Triple.trd c)
