@@ -32,7 +32,7 @@ let make rx ry rz =
   let mx = rotation_matrix Ox in
   let my = rotation_matrix Oy in
   let mz = rotation_matrix Oz in
-  Matrix3.mult (mz rz) (Matrix3.mult (my ry) (mx rx))
+  compose (mz rz) (compose (my ry) (mx rx))
 
 let apply r v = Matrix3.mult_vect r v
 
