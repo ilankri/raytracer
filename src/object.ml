@@ -1,5 +1,5 @@
 type face = {
-  norm_vect : Vect.t;
+  normal_vect : Vect.t;
   center : Vect.t;
   dist : float;
   center_opp : Vect.t;
@@ -22,7 +22,7 @@ let translate v = function
   | Box faces ->
     let translate_face v face =
       let add_v = Vect.add v in
-      let v_scal_n = Vect.scalprod v face.norm_vect in
+      let v_scal_n = Vect.scalprod v face.normal_vect in
       { face with center = add_v face.center;
                   dist = face.dist +. v_scal_n ;
                   center_opp = add_v face.center_opp;
@@ -50,10 +50,27 @@ let rotate rot = function
   | Box faces ->
     let rotate_face rot face =
       let apply_rot = Rotation.apply rot in
-      { face with norm_vect = apply_rot face.norm_vect;
+      { face with normal_vect = apply_rot face.normal_vect;
                   center = apply_rot face.center;
                   center_opp = apply_rot face.center_opp }
     in
     transform_box (rotate_face rot) faces
 
-let origin_box _ = failwith "TODO"
+let origin_box diag_vect =
+  let compute_face normal_vect dist_to_opp_face =
+    let dist = 0.5 *. dist_to_opp_face in
+    let center = Vect.shift dist normal_vect in
+    {
+      normal_vect = normal_vect;
+      center = center;
+      dist = dist;
+      center_opp = Vect.opp center;
+      dist_opp = -. dist;
+      half_dist = dist;
+    }
+  in
+  let std_basis = Triple.make Vect.xunit Vect.yunit Vect.zunit in
+  let dims =
+    Triple.make (Vect.vx diag_vect) (Vect.vy diag_vect) (Vect.vz diag_vect)
+  in
+  Box (Triple.map2 compute_face std_basis dims)

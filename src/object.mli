@@ -1,5 +1,5 @@
 type face = {
-  norm_vect : Vect.t;
+  normal_vect : Vect.t;
   center : Vect.t;
   dist : float;
   center_opp : Vect.t;
@@ -15,6 +15,7 @@ type t =
 val xOz : t
 
 val origin_box : Vect.t -> t
+(** @return the origin-centered box with given diagonal vector.  *)
 
 val translate : Vect.t -> t  -> t
 
