@@ -1,5 +1,5 @@
 type light = {
-  l_dir : Rotation.t;
+  l_dir : Vect.t;
   l_intensity : float
 }
 
@@ -12,7 +12,7 @@ type t = {
   camera : camera;
   ambient : float;
   lights : light list;
-  objects: Object.t list
+  objects: Object.t Texture.textured list
 }
 
 val eval : Scenario.scenario -> int -> t

@@ -3,7 +3,7 @@
 
 (* Types to represent a scene.  *)
 type light = {
-  l_dir : Rotation.t;
+  l_dir : Vect.t;
   l_intensity : float
 }
 
@@ -16,13 +16,13 @@ type t = {
   camera : camera;
   ambient : float;
   lights : light list;
-  objects: Object.t list
+  objects: Object.t Texture.textured list
 }
 
 (* Evaluation environment.  *)
 type environment = {
   nums : (string, float) Dict.t;
-  objs : (string, Object.t list) Dict.t;
+  objs : (string, Object.t Texture.textured list) Dict.t;
   procs : Scenario.proc list;
 }
 
@@ -75,38 +75,47 @@ let eval_camera env camera = {
 }
 
 let eval_texture env texture = {
-  Object.kd = eval_expr env texture.Scenario.kd;
-  Object.ks = eval_expr env texture.Scenario.ks;
-  Object.phong = eval_expr env texture.Scenario.phong;
-  Object.color = eval_color env texture.Scenario.color
+  Texture.kd = eval_expr env texture.Scenario.kd;
+  Texture.ks = eval_expr env texture.Scenario.ks;
+  Texture.phong = eval_expr env texture.Scenario.phong;
+  Texture.color = eval_color env texture.Scenario.color
 }
 
-let rec eval_obj env obj =
+let eval_obj env obj =
   let eval_expr' = eval_expr env in
   let eval_vector' = eval_vector env in
-  let eval_texture' = eval_texture env in
   let eval_rotation' = eval_rotation env in
-  let eval_obj' = eval_obj env in
-  match obj with
-  | Scenario.Object id -> lookup_obj env id
-  | Scenario.Sphere (center, radius, texture) ->
-    [Object.Sphere (eval_vector' center, eval_expr' radius,
-                    eval_texture' texture)]
-  | Scenario.Plane (rotation, dist, texture) ->
-    [Object.Plane (eval_rotation' rotation, eval_expr' dist,
-                   eval_texture' texture)]
-  | Scenario.Box (center, diag_vect, texture) ->
-    [Object.Box (eval_vector' center, eval_vector' diag_vect,
-                 eval_texture' texture)]
-  | Scenario.Translate (obj, vect) ->
-    List.map (Object.translate (eval_vector' vect)) (eval_obj' obj)
-  | Scenario.Scale (obj, k) ->
-    List.map (Object.scale (eval_expr' k)) (eval_obj' obj)
-  | Scenario.Rotate (obj, rotation) ->
-    List.map (Object.rotate (eval_rotation' rotation)) (eval_obj' obj)
-  | Scenario.Group [] -> []
-  | Scenario.Group (obj :: objl) ->
-    eval_obj' obj @ eval_obj' (Scenario.Group objl)
+  let textured texture obj =
+    [Texture.textured (eval_texture env texture) obj]
+  in
+  let rec aux = Scenario.(function
+      | Object id -> lookup_obj env id
+      | Sphere (center, radius, texture) ->
+        textured texture
+          (Object.Sphere (eval_vector' center, eval_expr' radius))
+      | Plane (rotation, dist, texture) ->
+        textured texture Object.(
+            xOz
+            |> rotate (eval_rotation' rotation)
+            |> translate (Vect.shift (eval_expr' dist) Vect.yunit)
+          )
+      | Box (center, diag_vect, texture) ->
+        textured texture Object.(
+            translate
+              (eval_vector' center)
+              (diag_vect |> eval_vector' |> origin_box)
+          )
+      | Translate (obj, v) ->
+        map (v |> eval_vector' |> Object.translate) obj
+      | Scale (obj, k) ->
+        map (k |> eval_expr' |> Object.scale) obj
+      | Rotate (obj, rot) ->
+        map (rot |> eval_rotation' |> Object.rotate) obj
+      | Group [] -> []
+      | Group (obj :: objl) -> aux obj @ aux (Scenario.Group objl)
+    )
+  and map trans obj = List.map (Texture.map trans) (aux obj) in
+  aux obj
 
 let rec eval_boolean env = Scenario.(function
     | And (b1, b2) -> eval_boolean env b1 && eval_boolean env b2
@@ -136,7 +145,10 @@ and eval_instr_list (env, objs) il =
   List.fold_left (fun (env, objs) -> eval_instruction env objs) (env, objs) il
 
 let eval_light env light = {
-  l_dir = eval_rotation env light.Scenario.l_dir;
+  l_dir =
+    Rotation.apply
+      (eval_rotation env light.Scenario.l_dir)
+      (Vect.opp Vect.yunit);
   l_intensity = eval_expr env light.Scenario.l_intensity
 }
 
