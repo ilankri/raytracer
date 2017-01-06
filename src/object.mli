@@ -9,7 +9,7 @@ type face = {
 
 type t =
   | Sphere of Vect.t * float (* center, radius *)
-  | Plane of Vect.t * float (* normal vector and dist from origin *)
+  | Plane of Vect.t * float (* vector orthogonal to this plan with length 1 and dist from origin *)
   | Box of face Triple.t
 
 val xOz : t
