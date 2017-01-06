@@ -8,10 +8,10 @@
 OPTS=-use-ocamlfind -use-menhir -pkg graphics
 
 opt:
-	ocamlbuild $(OPTS) main.native
+	ocamlbuild $(OPTS) ray.native
 
 byte:
-	ocamlbuild $(OPTS) -tag debug main.byte
+	ocamlbuild $(OPTS) -tag debug ray.byte
 
 clean:
 	ocamlbuild -clean
