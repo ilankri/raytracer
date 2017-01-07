@@ -15,4 +15,4 @@ type t = {
   objects: Object.t Texture.textured list
 }
 
-val eval : Scenario.scenario -> int -> t
+val make : Scenario.scenario -> int -> t

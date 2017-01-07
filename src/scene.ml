@@ -152,7 +152,7 @@ let eval_light env light = {
   l_intensity = eval_expr env light.Scenario.l_intensity
 }
 
-let eval scenario time =
+let make scenario time =
   let env = {
     nums = Dict.empty;
     objs = Dict.empty;
