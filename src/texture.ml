@@ -5,23 +5,12 @@ type t = {
   color : Color.t
 }
 
-type 'a textured = {
-  texture : t;
-  value : 'a
-}
+type 'a textured = t * 'a
 
-let textured t v = { texture = t; value = v }
+let textured t v = (t, v)
 
-(* let kd { texture = t; _ } = t.kd *)
+let texture (t, _) = t
 
-(* let ks { texture = t; _ } = t.ks *)
+let value (_, v) = v
 
-(* let phong { texture = t; _ } = t.phong *)
-
-(* let color { texture = t; _ } = t.color *)
-
-let value { value = v; _ } = v
-
-let texture { texture = t; _ } = t
-
-let map f x = { x with value = f x.value }
+let map f (t, v) = (t, f v)
