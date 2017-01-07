@@ -1,9 +1,9 @@
 type face = {
   normal_vect : Vect.t;
   center : Vect.t;
-  dist : float;
-  center_opp : Vect.t;
-  dist_opp : float;
+  dist_orig : float;
+  opp_center : Vect.t;
+  opp_dist_orig : float;
   half_dist : float
 }
 
