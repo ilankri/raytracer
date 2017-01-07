@@ -15,7 +15,7 @@ let intersect beam = Object.(function
           (r -. (Vect.scalprod n beam.source))
           /. (Vect.scalprod n beam.direction)
         in
-        Some (Vect.add beam.source (Vect.shift t beam.direction))
+        Some (n, Vect.add beam.source (Vect.shift t beam.direction))
     | _ -> failwith "Intersection of this object is not yet implemented"
   )
 
