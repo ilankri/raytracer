@@ -8,7 +8,7 @@ let black = make 0. 0. 0.
    int_of_float (can be improved by computing the nearest integer
    instead).  *)
 let to_bytes c =
-  Triple.to_tuple (Triple.map (fun x -> int_of_float (ldexp x 8)) c)
+  Triple.to_tuple (Triple.map (fun x -> int_of_float (x *. 255.)) c)
 
 let to_graphics c =
   let r, g, b = to_bytes c in
