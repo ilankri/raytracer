@@ -2,10 +2,12 @@ type t
 
 val make : Vect.t -> Vect.t -> t
 
-val intersect : t -> Object.t -> (Vect.t * Vect.t) option
-(** [intersect ray obj] returns, if [ray] intersects [obj], the pair
-    [(p, n)] with [p] the intersection point and [n] the unit normal
-    vector outward from impact surface.  *)
+type impact
+
+val intersect : t -> Object.t -> impact option
+(** [intersect ray obj] returns, if [ray] intersects [obj], the impact
+    point defined by the intersection point and the unit normal vector
+    outward from impact surface.  *)
 
 val trace : t -> int -> Scene.t -> Color.t
 (** [trace ray nb_max_reb scene] computes the color "viewed" by
