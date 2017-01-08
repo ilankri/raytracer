@@ -22,8 +22,8 @@ let main () =
     end;
   let scenario = read_scenario Sys.argv.(1) in
   let scene = Scene.make scenario 0 in
-  let width = 500 in
-  let height = 250 in
+  let width = 600 in
+  let height = 400 in
   let img = Image.make width height scene in
   Graphics.open_graph (" " ^ string_of_int width ^ "x" ^ string_of_int height);
   Graphics.draw_image (Image.to_graphics img) 0 0;

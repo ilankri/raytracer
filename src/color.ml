@@ -9,7 +9,8 @@ let white = make 1. 1. 1.
    int_of_float (can be improved by computing the nearest integer
    instead).  *)
 let to_bytes c =
-  Triple.to_tuple (Triple.map (fun x -> int_of_float (x *. 255.)) c)
+  let ceiling component = if component > 1. then 1. else component in
+  Triple.(to_tuple (map (fun x -> int_of_float (255. *. ceiling x)) c))
 
 let to_graphics c =
   let r, g, b = to_bytes c in
@@ -22,4 +23,5 @@ let mult c c' = Triple.map2 ( *. ) c c'
 let shift k c = Triple.map (( *. ) k) c
 
 let print c =
-  Printf.printf "color(%f, %f, %f)" (Triple.fst c) (Triple.snd c) (Triple.trd c)
+  let r, g, b = to_bytes c in
+  Printf.printf "color(%d, %d, %d)" r g b
