@@ -3,6 +3,7 @@ type t = float Triple.t
 let make r g b = Triple.make r g b
 
 let black = make 0. 0. 0.
+let white = make 1. 1. 1.
 
 (* This function leads to a precision loss because of the use of
    int_of_float (can be improved by computing the nearest integer
