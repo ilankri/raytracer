@@ -63,7 +63,8 @@ let rec eval_expr env = Scenario.(function
 let eval_expr3 make env (e1, e2, e3) =
   make (eval_expr env e1) (eval_expr env e2) (eval_expr env e3)
 
-let eval_color env c = eval_expr3 Color.make env c
+let eval_color env c =
+  eval_expr3 (fun r g b -> Color.make (r /. 255.) (g /. 255.) (b /. 255.)) env c
 
 let eval_rotation env r = eval_expr3 Rotation.make env r
 
