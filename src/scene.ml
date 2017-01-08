@@ -93,13 +93,10 @@ let eval_obj env obj =
       | Object id -> lookup_obj env id
       | Sphere (center, radius, texture) ->
         textured texture
-          (Object.Sphere (eval_vector' center, eval_expr' radius))
+          (Object.sphere (eval_vector' center) (eval_expr' radius))
       | Plane (rotation, dist, texture) ->
-        textured texture Object.(
-            xOz
-            |> rotate (eval_rotation' rotation)
-            |> translate (Vect.shift (eval_expr' dist) Vect.yunit)
-          )
+        let n = Rotation.apply (eval_rotation' rotation) Vect.yunit in
+        textured texture (Object.plane n (eval_expr' dist))
       | Box (center, diag_vect, texture) ->
         textured texture Object.(
             translate

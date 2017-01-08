@@ -12,29 +12,58 @@ type impact = {
 
 let position ray t = Vect.(ray.dir |> shift t |> add ray.src)
 
-let intersect beam = Object.(function
+let rec intersect_face ray (face1, face2, face3) =
+  let d_scal_n = Vect.scalprod ray.dir face1.Object.normal_vect in
+  if d_scal_n = 0. then None else
+  if d_scal_n < 0. then
+    intersect ray Object.(plane face1.normal_vect face1.dist_orig)
+  else
+    let impact =
+      intersect ray
+        Object.(plane (Vect.opp face1.normal_vect) (face1.opp_dist_orig))
+    in
+    match impact with
+    | Some { point = i } ->
+      let ci_v = Vect.normalised_diff i face1.Object.opp_center in
+      let cond face =
+        let d = Vect.scalprod ci_v face.Object.normal_vect in
+        abs_float d <= face.Object.half_dist
+      in
+      if cond face2 && cond face3 then impact else None
+    | _ -> None
+
+and intersect ray = Object.(function
     | Plane (n, d) ->
-      let p = Vect.scalprod n beam.src in
+      let p = Vect.scalprod n ray.src in
       if p <= d then None
-      else if Vect.scalprod n beam.dir >= 0. then None
+      else if Vect.scalprod n ray.dir >= 0. then None
       else
         let t =
-          (d -. (Vect.scalprod n beam.src))
-          /. (Vect.scalprod n beam.dir)
+          (d -. (Vect.scalprod n ray.src))
+          /. (Vect.scalprod n ray.dir)
         in
-        Some { point = position beam t; norm_vect = n }
+        Some { point = position ray t; norm_vect = n }
     | Sphere (c, r) ->
-      let sc_v = Vect.diff c beam.src in
-      let sa = Vect.scalprod sc_v beam.dir in
+      let sc_v = Vect.diff c ray.src in
+      let sa = Vect.scalprod sc_v ray.dir in
       if sa <= 0. then None else
-        let sc2 = Vect.dist2 c beam.src in
+        let sc2 = Vect.dist2 c ray.src in
         let ac2 = sc2 -. sa *. sa in
         if sqrt ac2 >= r then None else
           let ab = sqrt (r *. r -. ac2) in
           let sb = sa -. ab in
-          let b = position beam sb in
+          let b = position ray sb in
           Some { point = b; norm_vect = Vect.(c |> diff b |> shift (1. /. r)) }
-    | _ -> failwith "Intersection of this object is not yet implemented"
+    | Box faces ->
+      let face1, face2, face3 = Triple.to_tuple faces in
+      begin match intersect_face ray (face1, face2, face3) with
+      | None ->
+        begin match intersect_face ray (face2, face3, face1) with
+          | None -> intersect_face ray (face3, face1, face2)
+          | i -> i
+        end
+      | i -> i
+      end
   )
 
 let first_impact ray objs =
@@ -54,7 +83,7 @@ let first_impact ray objs =
   aux ray infinity None objs
 
 let visible_light norm_v impact_pt objs light =
-  Vect.scalprod light.Scene.l_dir norm_v < 0. &&
+  (* Vect.scalprod light.Scene.l_dir norm_v < 0. && *)
   first_impact { src = impact_pt; dir = Vect.opp light.Scene.l_dir } objs = None
 
 let weighted_sum compute_term lights =

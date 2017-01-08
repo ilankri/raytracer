@@ -12,7 +12,9 @@ type t =
   | Plane of Vect.t * float
   | Box of face Triple.t
 
-let xOz = Plane (Vect.yunit, 0.)
+let sphere c r = Sphere (c, r)
+
+let plane n d = Plane (n, d)
 
 let transform_box face_trans faces = Box (Triple.map face_trans faces)
 
@@ -24,11 +26,15 @@ let translate v = function
       let add_v = Vect.add v in
       let v_scal_n = Vect.scalprod v face.normal_vect in
       { face with center = add_v face.center;
-                  dist_orig = face.dist_orig +. v_scal_n ;
+                  dist_orig = face.dist_orig +. v_scal_n;
                   opp_center = add_v face.opp_center;
                   opp_dist_orig = face.opp_dist_orig -. v_scal_n }
     in
     transform_box (translate_face v) faces
+
+let shift_plane dist = function
+  | Plane (n, _) as p -> translate (Vect.shift dist n) p
+  | _ -> assert false
 
 let scale k = function
   | Sphere (c, r) -> Sphere (c, r *. k)
@@ -58,15 +64,16 @@ let rotate rot = function
 
 let origin_box diag_vect =
   let compute_face normal_vect dist_to_opp_face =
-    let dist = 0.5 *. dist_to_opp_face in
-    let center = Vect.shift dist normal_vect in
+    assert(dist_to_opp_face > 0.);
+    let half_dist = ldexp dist_to_opp_face (-1) in
+    let center = Vect.shift half_dist normal_vect in
     {
       normal_vect = normal_vect;
       center = center;
-      dist_orig = dist;
+      dist_orig = half_dist;
       opp_center = Vect.opp center;
-      opp_dist_orig = -. dist;
-      half_dist = dist;
+      opp_dist_orig = half_dist;
+      half_dist = half_dist;
     }
   in
   let std_basis = Triple.make Vect.xunit Vect.yunit Vect.zunit in

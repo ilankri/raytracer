@@ -9,7 +9,10 @@ let white = make 1. 1. 1.
    int_of_float (can be improved by computing the nearest integer
    instead).  *)
 let to_bytes c =
-  let ceiling component = if component > 1. then 1. else component in
+  let ceiling component =
+    if component > 1. then 1. else
+    if component < 0. then 0. else component
+  in
   Triple.(to_tuple (map (fun x -> int_of_float (255. *. ceiling x)) c))
 
 let to_graphics c =

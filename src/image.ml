@@ -19,7 +19,7 @@ let make width height scene =
   in
   for i = 0 to height - 1 do
     for j = 0 to width - 1 do
-      img.(i).(j) <- Beam.trace (ray_of_pixel j i) 10 scene;
+      img.(i).(j) <- Beam.trace (ray_of_pixel j i) 8 scene;
     done;
   done;
   img
