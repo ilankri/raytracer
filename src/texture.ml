@@ -7,10 +7,12 @@ type t = {
 
 type 'a textured = t * 'a
 
-let textured t v = (t, v)
+let textured t x = (t, x)
+
+let destruct (t, x) = (x, t)
 
 let texture (t, _) = t
 
-let value (_, v) = v
+let untextured (_, x) = x
 
-let map f (t, v) = (t, f v)
+let map f (t, x) = (t, f x)

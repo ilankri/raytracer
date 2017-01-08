@@ -9,8 +9,10 @@ type 'a textured
 
 val textured : t -> 'a -> 'a textured
 
+val destruct : 'a textured -> 'a * t
+
 val texture : 'a textured -> t
 
-val value : 'a textured -> 'a
+val untextured : 'a textured -> 'a
 
 val map : ('a -> 'b) -> 'a textured -> 'b textured
