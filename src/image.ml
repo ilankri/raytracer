@@ -8,7 +8,7 @@ let make width height scene =
     let screen_point =
       Vect.make
         (x -. float_of_int (width asr 1))
-        (y -. float_of_int (height asr 1))
+        (float_of_int (height asr 1) -. y)
         Scene.(scene.camera.viewdist -.
                float_of_int width /.
                ldexp (tan (ldexp scene.camera.angle (-1))) 1)
@@ -19,7 +19,7 @@ let make width height scene =
   in
   for i = 0 to height - 1 do
     for j = 0 to width - 1 do
-      img.(i).(j) <- Beam.trace (ray_of_pixel j i) 1 scene;
+      img.(i).(j) <- Beam.trace (ray_of_pixel j i) 10 scene;
     done;
   done;
   img

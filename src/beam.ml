@@ -13,16 +13,15 @@ type impact = {
 let position ray t = Vect.(ray.dir |> shift t |> add ray.src)
 
 let intersect beam = Object.(function
-    | Plane (n, r) ->
+    | Plane (n, d) ->
       let p = Vect.scalprod n beam.src in
-      if p <= r then None
+      if p <= d then None
       else if Vect.scalprod n beam.dir >= 0. then None
       else
         let t =
-          (r -. (Vect.scalprod n beam.src))
+          (d -. (Vect.scalprod n beam.src))
           /. (Vect.scalprod n beam.dir)
         in
-        print_endline "intersect plane";
         Some { point = position beam t; norm_vect = n }
     | Sphere (c, r) ->
       let sc_v = Vect.diff c beam.src in
@@ -34,8 +33,6 @@ let intersect beam = Object.(function
           let ab = sqrt (r *. r -. ac2) in
           let sb = sa -. ab in
           let b = position beam sb in
-                  (* print_endline "intersect sphere"; *)
-
           Some { point = b; norm_vect = Vect.(c |> diff b |> shift (1. /. r)) }
     | _ -> failwith "Intersection of this object is not yet implemented"
   )
@@ -46,7 +43,7 @@ let first_impact ray objs =
     | obj :: objs ->
       begin match intersect ray (Texture.untextured obj) with
         | Some ({ point = p; norm_vect = n } as impact) ->
-          let dist' = abs_float (Vect.dist p ray.src) in
+          let dist' = Vect.dist p ray.src in
           if dist' < dist then
             aux ray dist' (Some (Texture.(textured (texture obj) impact))) objs
           else
@@ -56,36 +53,38 @@ let first_impact ray objs =
   in
   aux ray infinity None objs
 
-let visible_light norm_v light = Vect.scalprod light.Scene.l_dir norm_v < 0.
+let visible_light norm_v impact_pt objs light =
+  Vect.scalprod light.Scene.l_dir norm_v < 0. &&
+  first_impact { src = impact_pt; dir = Vect.opp light.Scene.l_dir } objs = None
 
 let weighted_sum compute_term lights =
   List.fold_left (fun acc l -> acc +. compute_term l *. l.Scene.l_intensity)
     0. lights
 
 let rec trace ray depth scene =
-  if depth = 0 then
-    Color.black
-  else
-    match first_impact ray scene.Scene.objects with
-    | None -> Color.black
-    | Some impact ->
-      let { point = p; norm_vect = n }, t = Texture.destruct impact in
-      let compute_term light = Vect.scalprod n light.Scene.l_dir in
-      let compute_term' light =
-        let hj = Vect.normalised_diff (Vect.opp light.Scene.l_dir) ray.dir in
-        Vect.scalprod n hj ** t.Texture.phong
-      in
-      let visible_lights = List.filter (visible_light n) scene.Scene.lights in
-      let k =
-        t.Texture.kd *. (scene.Scene.ambient -.
-                         weighted_sum compute_term visible_lights)
-      in
-      let k' = t.Texture.ks *. weighted_sum compute_term' visible_lights in
-      let c = Color.shift (k +. k') t.Texture.color in
+  match first_impact ray scene.Scene.objects with
+  | None -> Color.black
+  | Some impact ->
+    let { point = p; norm_vect = n }, t = Texture.destruct impact in
+    let compute_term light = Vect.scalprod n light.Scene.l_dir in
+    let compute_term' light =
+      let hj = Vect.normalised_diff (Vect.opp light.Scene.l_dir) ray.dir in
+      Vect.scalprod n hj ** t.Texture.phong
+    in
+    let visible_lights = List.filter (visible_light n p scene.Scene.objects)
+        scene.Scene.lights in
+    let k =
+      t.Texture.kd *. (scene.Scene.ambient -.
+                       weighted_sum compute_term visible_lights)
+    in
+    let k' = t.Texture.ks *. weighted_sum compute_term' visible_lights in
+    let c = Color.shift (k +. k') t.Texture.color in
+    if depth = 0 then c else
       let dir_refl_ray =
-        Vect.normalised_diff
-          ray.dir
-          Vect.(shift (ldexp (scalprod n ray.dir) 1) n)
+      Vect.normalised_diff
+        ray.dir
+        Vect.(shift (ldexp (scalprod n ray.dir) 1) n)
       in
       let refl_ray = { src = p; dir = dir_refl_ray } in
-      Color.(add c (shift t.Texture.ks (trace refl_ray (depth - 1) scene)))
+      Color.(add c (shift t.Texture.ks
+                      (trace refl_ray (depth - 1) scene)))
