@@ -1,4 +1,3 @@
-
 ## Quelques possibilités d'options supplémentaires pour ocamlbuild:
 ## -pkg xxx : pour utiliser d'autres bibiliothèques
 ##            (p.ex. unix, functory, parmap, ...)
@@ -13,6 +12,8 @@ opt:
 byte:
 	ocamlbuild $(OPTS) -tag debug ray.byte
 
+doc:
+	ocamlbuild ray.docdir/index.html
+
 clean:
 	ocamlbuild -clean
-

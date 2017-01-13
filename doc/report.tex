@@ -1,0 +1,96 @@
+\documentclass[a4paper,12pt,english,french]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+
+\usepackage{babel}
+\babeltags{eng=english}
+\newcommand{\texten}[1]{\texteng{\emph{#1}}}
+\frenchbsetup{ItemLabels=\textendash{}, og=«, fg=»}
+\usepackage{geometry}
+\usepackage[final,babel]{microtype}
+
+\author{Idir Lankri \and{} Yung-Kun Hsieh}
+\title{Compte-rendu}
+\date{}
+
+\begin{document}
+\maketitle{}
+
+\section{Fonctionnalités du programme}
+\label{sec:fonct-du-progr}
+
+\paragraph{}
+
+Le programme fourni permet d'afficher trois sortes d'objets
+géométriques : des plans (infinis), des sphères et des « boîtes ».  On
+peut également appliquer des transformations à ces objets : homothétie,
+translation et rotation.
+
+\paragraph{}
+
+Le rendu graphique de la scène décrite dans le fichier scénario se fait
+via la bibliothèque \texttt{Graphics}.  Pour avoir une animation, on
+affiche simplement une suite d'images en faisant varier la variable
+spéciale \texttt{time}.
+
+\paragraph{}
+
+L'utilisateur peut spécifier en ligne de commande la résolution de
+l'image, le nombre d'images pour une animation ainsi que le nombre
+maximal de rebonds d'un rayon (voir l'option \texttt{-help} du programme
+pour plus de détails).
+
+\section{Principaux modules}
+\label{sec:principaux-modules}
+
+\subsection{Module \texttt{Scene}}
+\label{sec:scene-1}
+
+Ce module se charge de traduire la structure décrivant la syntaxe
+abstraite du fichier scénario (type \texttt{Scenario.scenario}) en une
+représentation adaptée aux calculs internes du programme (type
+\texttt{Scene.t}).  C'est en fait un interpréteur du langage de
+description de scène.
+
+\subsection{Module \texttt{Object}}
+\label{sec:module-object}
+
+Dans ce module, on définit la représentation des différents objets et la
+manière dont les transformations agissent sur ces objets.
+
+\subsection{Module \texttt{Beam}}
+\label{sec:module-beam}
+
+C'est dans ce module que l'on fait le \texten{ray tracing}.  On cherche
+le premier objet de la scène intersecté par un rayon donné puis on
+calcule en conséquence la couleur « vue » par le rayon par récurrence
+(par rebonds successifs).
+
+\section{Extensions et améliorations possibles}
+\label{sec:extens-et-amel}
+
+\paragraph{}
+
+La principale amélioration possible est de paralléliser le calcul des
+images et des pixels étant donné que le calcul de chaque image
+(resp. pixel) est indépendant des autres.
+
+\paragraph{}
+
+On pourrait utiliser le \texten{hashconsing} sur les objets
+géométriques.  Cela permettrait par exemple d'éviter de reconstruire les
+objets fixes de la scène pour chaque image d'une animation.
+
+\paragraph{}
+
+L'utilisateur pourrait choisir la manière dont le rendu graphique est
+fait : « en direct » (comme c'est actuellement le cas) ou vers un
+fichier image ou vidéo.
+
+\end{document}
+
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-master: t
+%%% End:
