@@ -6,8 +6,8 @@ type t = {
 let make s d = { src = s; dir = d }
 
 type impact = {
-  point : Vect.t;
-  norm_vect : Vect.t;
+  point : Vect.t;     (* Impact point.  *)
+  norm_vect : Vect.t; (* Outward normal vector to the impact surface.  *)
 }
 
 let position ray t = Vect.(ray.dir |> shift t |> add ray.src)
@@ -15,16 +15,17 @@ let position ray t = Vect.(ray.dir |> shift t |> add ray.src)
 let rec intersect_face ray (face1, face2, face3) =
   let d_scal_n = Vect.scalprod ray.dir face1.Object.normal_vect in
   if d_scal_n = 0. then None else
-  if d_scal_n < 0. then
-    intersect ray Object.(plane face1.normal_vect face1.dist_orig)
-  else
-    let impact =
-      intersect ray
-        Object.(plane (Vect.opp face1.normal_vect) (face1.opp_dist_orig))
+    let normal_vect, dist_orig, center =
+      if d_scal_n < 0. then
+        Object.(face1.normal_vect, face1.dist_orig, face1.center)
+      else
+        Object.(Vect.opp face1.normal_vect,
+                face1.opp_dist_orig, face1.opp_center)
     in
+    let impact = intersect ray Object.(plane normal_vect dist_orig) in
     match impact with
     | Some { point = i } ->
-      let ci_v = Vect.normalised_diff i face1.Object.opp_center in
+      let ci_v = Vect.diff i center in
       let cond face =
         let d = Vect.scalprod ci_v face.Object.normal_vect in
         abs_float d <= face.Object.half_dist
@@ -32,17 +33,17 @@ let rec intersect_face ray (face1, face2, face3) =
       if cond face2 && cond face3 then impact else None
     | _ -> None
 
+(* [intersect ray obj] returns, if [ray] intersects [obj], the impact
+   point defined by the intersection point and the unit normal vector
+   outward from impact surface.  *)
 and intersect ray = Object.(function
     | Plane (n, d) ->
       let p = Vect.scalprod n ray.src in
-      if p <= d then None
-      else if Vect.scalprod n ray.dir >= 0. then None
-      else
-        let t =
-          (d -. (Vect.scalprod n ray.src))
-          /. (Vect.scalprod n ray.dir)
-        in
-        Some { point = position ray t; norm_vect = n }
+      if p <= d then None else
+        let n_scal_dir =  Vect.scalprod n ray.dir in
+        if n_scal_dir >= 0. then None else
+          let t = (d -. p) /. n_scal_dir in
+          Some { point = position ray t; norm_vect = n }
     | Sphere (c, r) ->
       let sc_v = Vect.diff c ray.src in
       let sa = Vect.scalprod sc_v ray.dir in
@@ -57,12 +58,12 @@ and intersect ray = Object.(function
     | Box faces ->
       let face1, face2, face3 = Triple.to_tuple faces in
       begin match intersect_face ray (face1, face2, face3) with
-      | None ->
-        begin match intersect_face ray (face2, face3, face1) with
-          | None -> intersect_face ray (face3, face1, face2)
-          | i -> i
-        end
-      | i -> i
+        | None ->
+          begin match intersect_face ray (face2, face3, face1) with
+            | None -> intersect_face ray (face3, face1, face2)
+            | i -> i
+          end
+        | i -> i
       end
   )
 
@@ -83,7 +84,6 @@ let first_impact ray objs =
   aux ray infinity None objs
 
 let visible_light norm_v impact_pt objs light =
-  (* Vect.scalprod light.Scene.l_dir norm_v < 0. && *)
   first_impact { src = impact_pt; dir = Vect.opp light.Scene.l_dir } objs = None
 
 let weighted_sum compute_term lights =
@@ -110,9 +110,9 @@ let rec trace ray depth scene =
     let c = Color.shift (k +. k') t.Texture.color in
     if depth = 0 then c else
       let dir_refl_ray =
-      Vect.normalised_diff
-        ray.dir
-        Vect.(shift (ldexp (scalprod n ray.dir) 1) n)
+        Vect.normalised_diff
+          ray.dir
+          Vect.(shift (ldexp (scalprod n ray.dir) 1) n)
       in
       let refl_ray = { src = p; dir = dir_refl_ray } in
       Color.(add c (shift t.Texture.ks

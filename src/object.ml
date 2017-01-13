@@ -32,10 +32,6 @@ let translate v = function
     in
     transform_box (translate_face v) faces
 
-let shift_plane dist = function
-  | Plane (n, _) as p -> translate (Vect.shift dist n) p
-  | _ -> assert false
-
 let scale k = function
   | Sphere (c, r) -> Sphere (c, r *. k)
   | Plane (n, d) -> Plane (n, d *. k)
@@ -64,7 +60,7 @@ let rotate rot = function
 
 let origin_box diag_vect =
   let compute_face normal_vect dist_to_opp_face =
-    assert(dist_to_opp_face > 0.);
+    let dist_to_opp_face = abs_float dist_to_opp_face in
     let half_dist = ldexp dist_to_opp_face (-1) in
     let center = Vect.shift half_dist normal_vect in
     {

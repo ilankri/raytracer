@@ -1,3 +1,5 @@
+(** Scenario interpreter.  *)
+
 type light = {
   l_dir : Vect.t;
   l_intensity : float

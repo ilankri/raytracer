@@ -1,6 +1,6 @@
 type t = Color.t array array
 
-let make width height scene =
+let make width height depth scene =
   let img = Array.make_matrix height width Color.black in
   let ray_of_pixel x y =
     let x = float_of_int x in
@@ -19,7 +19,7 @@ let make width height scene =
   in
   for i = 0 to height - 1 do
     for j = 0 to width - 1 do
-      img.(i).(j) <- Beam.trace (ray_of_pixel j i) 4 scene;
+      img.(i).(j) <- Beam.trace (ray_of_pixel j i) depth scene;
     done;
   done;
   img

@@ -1,3 +1,5 @@
+(** Geometric objects.  *)
+
 type face = private {
   normal_vect : Vect.t;         (** Outward normal vector.  *)
   center : Vect.t;              (** Center.  *)
@@ -24,8 +26,6 @@ val translate : Vect.t -> t  -> t
 val scale : float -> t  -> t
 
 val rotate : Rotation.t -> t  -> t
-
-val shift_plane : float -> t -> t
 
 val sphere : Vect.t -> float -> t
 (** @return a sphere with the given center and radius.  *)
