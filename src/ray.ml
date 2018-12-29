@@ -41,15 +41,15 @@ let main () =
     set_if_cond ((<=) 0), set_if_cond ((<) 0)
   in
   let options = Arg.(
-      align  [("-hsize", Int (set_if_strict_pos hsize),
-               "<int> Set the width of image");
-              ("-vsize", Int (set_if_strict_pos vsize),
-               "<int> Set the height of image");
-              ("-depth", Int (set_if_pos depth),
-               "<int> Set the maximal number of bounces");
-              ("-anim", Int (set_if_strict_pos anim),
-               "<int> Set the number of images")]
-    )
+    align  [("-hsize", Int (set_if_strict_pos hsize),
+             "<int> Set the width of image");
+            ("-vsize", Int (set_if_strict_pos vsize),
+             "<int> Set the height of image");
+            ("-depth", Int (set_if_pos depth),
+             "<int> Set the maximal number of bounces");
+            ("-anim", Int (set_if_strict_pos anim),
+             "<int> Set the number of images")]
+  )
   in
   let usage_msg = Sys.argv.(0) ^ " [options] scenario_file" in
   Arg.parse options display_image usage_msg;

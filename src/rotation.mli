@@ -1,11 +1,10 @@
-
 (* Rotations dans l'espace tri-dimensionnel. *)
 
 (* Une rotation est créée à partir de trois nombres [rx], [ry] et [rz]
     qui représentent :
-    - une rotation d'angle [rx] autour de l'axe des [x]
-    - puis une rotation d'angle [ry] autour de l'axe des [y]
-    - puis une rotation d'angle [rz] autour de l'axe des [z]
+   - une rotation d'angle [rx] autour de l'axe des [x]
+   - puis une rotation d'angle [ry] autour de l'axe des [y]
+   - puis une rotation d'angle [rz] autour de l'axe des [z]
 
     Ces trois rotations élémentaires se font chacunes dans le sens
     inverse des aiguilles d'une montre. On peut utiliser la "règle

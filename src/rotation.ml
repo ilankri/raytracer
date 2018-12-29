@@ -12,17 +12,17 @@ let rotation_matrix axis alpha =
   let l1, l2, l3 =
     match axis with
     | Ox ->
-      Vect.xunit,
-      Vect.make 0. cos_alpha (-.sin_alpha),
-      Vect.make 0. sin_alpha cos_alpha
+        Vect.xunit,
+        Vect.make 0. cos_alpha (-.sin_alpha),
+        Vect.make 0. sin_alpha cos_alpha
     | Oy ->
-      Vect.make cos_alpha 0. sin_alpha,
-      Vect.yunit,
-      Vect.make (-.sin_alpha) 0. cos_alpha
+        Vect.make cos_alpha 0. sin_alpha,
+        Vect.yunit,
+        Vect.make (-.sin_alpha) 0. cos_alpha
     | Oz ->
-      Vect.make cos_alpha (-.sin_alpha) 0.,
-      Vect.make sin_alpha cos_alpha 0.,
-      Vect.zunit
+        Vect.make cos_alpha (-.sin_alpha) 0.,
+        Vect.make sin_alpha cos_alpha 0.,
+        Vect.zunit
   in
   Matrix3.make l1 l2 l3
 

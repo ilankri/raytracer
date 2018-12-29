@@ -29,10 +29,10 @@ type obj =
   | Object of string (* object identifier *)
   | Sphere of position * expr * texture (* center, radius *)
   | Plane of rotation * expr * texture
-     (* horizontal plane (xOz, normal vector Oy),
-        then rotated and put at some dist from origin *)
+  (* horizontal plane (xOz, normal vector Oy),
+     then rotated and put at some dist from origin *)
   | Box of position * vector * texture
-     (* center, diagonal vector a.k.a. width/height/depth *)
+  (* center, diagonal vector a.k.a. width/height/depth *)
   | Translate of obj * vector (* object, translation vector *)
   | Scale of obj * expr (* object, scale factor *)
   | Rotate of obj * rotation (* object, rotation *)

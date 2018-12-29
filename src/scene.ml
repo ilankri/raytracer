@@ -39,26 +39,26 @@ let lookup_proc env id =
 
 (* Evaluation.  *)
 let eval_binop = Scenario.(function
-    | Plus -> (+.)
-    | Minus -> (-.)
-    | Mult -> ( *. )
-    | Div -> (/.)
-  )
+  | Plus -> (+.)
+  | Minus -> (-.)
+  | Mult -> ( *. )
+  | Div -> (/.)
+)
 
 let eval_unop = Scenario.(function
-    | Sin -> sin
-    | Cos -> cos
-    | Sqrt -> sqrt
-    | Opp -> (~-.)
-  )
+  | Sin -> sin
+  | Cos -> cos
+  | Sqrt -> sqrt
+  | Opp -> (~-.)
+)
 
 let rec eval_expr env = Scenario.(function
-    | Bin (binop, e1, e2) ->
+  | Bin (binop, e1, e2) ->
       (eval_binop binop) (eval_expr env e1) (eval_expr env e2)
-    | Uni (unop, e) -> (eval_unop unop) (eval_expr env e)
-    | Const c -> c
-    | Ident id -> lookup_num env id
-  )
+  | Uni (unop, e) -> (eval_unop unop) (eval_expr env e)
+  | Const c -> c
+  | Ident id -> lookup_num env id
+)
 
 let eval_expr3 make env (e1, e2, e3) =
   make (eval_expr env e1) (eval_expr env e2) (eval_expr env e3)
@@ -90,46 +90,46 @@ let eval_obj env obj =
     [Texture.textured (eval_texture env texture) obj]
   in
   let rec aux = Scenario.(function
-      | Object id -> lookup_obj env id
-      | Sphere (center, radius, texture) ->
+    | Object id -> lookup_obj env id
+    | Sphere (center, radius, texture) ->
         textured texture
           (Object.sphere (eval_vector' center) (eval_expr' radius))
-      | Plane (rotation, dist, texture) ->
+    | Plane (rotation, dist, texture) ->
         let n = Rotation.apply (eval_rotation' rotation) Vect.yunit in
         textured texture (Object.plane n (eval_expr' dist))
-      | Box (center, diag_vect, texture) ->
+    | Box (center, diag_vect, texture) ->
         textured texture Object.(
-            translate
-              (eval_vector' center)
-              (diag_vect |> eval_vector' |> origin_box)
-          )
-      | Translate (obj, v) ->
+          translate
+            (eval_vector' center)
+            (diag_vect |> eval_vector' |> origin_box)
+        )
+    | Translate (obj, v) ->
         map (v |> eval_vector' |> Object.translate) obj
-      | Scale (obj, k) ->
+    | Scale (obj, k) ->
         map (k |> eval_expr' |> Object.scale) obj
-      | Rotate (obj, rot) ->
+    | Rotate (obj, rot) ->
         map (rot |> eval_rotation' |> Object.rotate) obj
-      | Group [] -> []
-      | Group (obj :: objl) -> aux obj @ aux (Scenario.Group objl)
-    )
+    | Group [] -> []
+    | Group (obj :: objl) -> aux obj @ aux (Scenario.Group objl)
+  )
   and map trans obj = List.map (Texture.map trans) (aux obj) in
   aux obj
 
 let rec eval_boolean env = Scenario.(function
-    | And (b1, b2) -> eval_boolean env b1 && eval_boolean env b2
-    | Or (b1, b2) -> eval_boolean env b1 || eval_boolean env b2
-    | Not (b) -> not (eval_boolean env b)
-    | Equal (e1, e2) -> eval_expr env e1 = eval_expr env e2
-    | Less (e1, e2) -> eval_expr env e1 < eval_expr env e2
-  )
+  | And (b1, b2) -> eval_boolean env b1 && eval_boolean env b2
+  | Or (b1, b2) -> eval_boolean env b1 || eval_boolean env b2
+  | Not (b) -> not (eval_boolean env b)
+  | Equal (e1, e2) -> eval_expr env e1 = eval_expr env e2
+  | Less (e1, e2) -> eval_expr env e1 < eval_expr env e2
+)
 
 let rec eval_instruction env objs = Scenario.(function
-    | SetNum (id, e) -> (add_num env id (eval_expr env e), objs)
-    | SetObj (id, o) -> (add_obj env id (eval_obj env o), objs)
-    | Put o -> (env, (eval_obj env o) @ objs)
-    | If (b, il1, il2) ->
+  | SetNum (id, e) -> (add_num env id (eval_expr env e), objs)
+  | SetObj (id, o) -> (add_obj env id (eval_obj env o), objs)
+  | Put o -> (env, (eval_obj env o) @ objs)
+  | If (b, il1, il2) ->
       eval_instr_list (env, objs) (if eval_boolean env b then il1 else il2)
-    | Call (id, args) ->
+  | Call (id, args) ->
       let proc = lookup_proc env id in
       let eval_and_bind_arg env param arg =
         add_num env param (eval_expr env arg)
@@ -137,7 +137,7 @@ let rec eval_instruction env objs = Scenario.(function
       let local_env = List.fold_left2 eval_and_bind_arg env proc.params args in
       let _, objs = eval_instr_list (local_env, objs) proc.body in
       (env, objs)
-  )
+)
 
 and eval_instr_list (env, objs) il =
   List.fold_left (fun (env, objs) -> eval_instruction env objs) (env, objs) il
