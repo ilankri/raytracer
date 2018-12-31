@@ -1,10 +1,13 @@
 ## Quelques possibilités d'options supplémentaires pour ocamlbuild:
-## -pkg xxx : pour utiliser d'autres bibiliothèques
-##            (p.ex. unix, functory, parmap, ...)
 ## -cflag -unsafe : pour accélerer les accès aux tableaux
 ##                  une fois que le code fonctionne bien
 
-OPTS=-use-ocamlfind -use-menhir -pkg graphics
+SHELL = /bin/sh
+
+OPTS = -use-ocamlfind -use-menhir -pkg graphics
+
+.SUFFIXES:
+.PHONY: opt byte doc clean
 
 opt:
 	ocamlbuild $(OPTS) ray.native

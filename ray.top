@@ -1,0 +1,8 @@
+#!ocaml -init
+
+#directory "_build/src";;
+#load "graphics.cma";;
+#load_rec "ray.cmo";;
+let () = print_string "Raytracing modules loaded.\n\n";;
+open Ray;;
+open Scenario;;

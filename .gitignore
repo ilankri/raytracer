@@ -1,3 +1,4 @@
-src/_build
-src/*.native
-src/*.byte
+_build/
+*.byte
+*.docdir
+*.native
