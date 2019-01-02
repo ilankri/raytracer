@@ -17,28 +17,28 @@ Si vous avez accès à l'internet vous pouvez voir quelques exemples
 d'images impressionnantes obtenues avec une bonne implantations du
 lancer de rayon (POVRAY) sur le site http://www.povray.org. Dans ce
 projet, nous allons réaliser une implantation plus modeste, mais qui
-permet toutefois d'obtenir de bonnes images. Vous trouverez dans le
-répertoire [pics/](pics/) quelques images produites les années passées.
+permet toutefois d'obtenir de bonnes images.
 
 ### Travail demandé ###
 
 A faire d'ici à **Dimanche 8 Janvier 2016 23:59**, par groupe d'au plus 3 étudiants.
 
 * **Implémenter les notions géométriques nécessaires**. Vous trouverez
-  plus de détails dans le fichier de référence [doc/objets.pdf](doc/objets.pdf).
-  En particulier, à vous de choisir une représentation des objets
-  géométriques aussi adaptée que possible au calcul des lancers de
-  rayons. Certaines interfaces de modules vous sont déjà données, p.ex.
-  [src/vect.mli](src/vect.mli). Merci de ne pas modifier ces interfaces sans
-  notre accord. Par contre les types dans ces interfaces étant abstraits,
-  vous pourrez les implémenter à votre guise.
+  plus de détails dans le fichier de référence
+  [doc/objects.pdf](doc/objects.pdf).  En particulier, à vous de choisir
+  une représentation des objets géométriques aussi adaptée que possible
+  au calcul des lancers de rayons. Certaines interfaces de modules vous
+  sont déjà données, p.ex.  [src/vect.mli](src/vect.mli). Merci de ne
+  pas modifier ces interfaces sans notre accord. Par contre les types
+  dans ces interfaces étant abstraits, vous pourrez les implémenter
+  à votre guise.
 
 * **Convertir les scénarios en scène prête à être tracée**. Le format
   de fichier scénario est une description de haut niveau d'une scène,
   et peut contenir en particulier des abréviations ou des appels
   de procédure de construction. Plus de détails dans le fichier
   [doc/scenarios.pdf](doc/scenarios.pdf). Des exemples de scénarios
-  sont fournis dans [scenarios/](scenarios/). Nous vous fournissons
+  sont fournis dans [examples/](examples/). Nous vous fournissons
   le lexeur et parseur permettant d'obtenir une représentation OCaml
   de ces scénarios. A vous de convertir ensuite ces scénarios
   vers vos représentations d'objets géométriques.
