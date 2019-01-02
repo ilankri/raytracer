@@ -72,8 +72,8 @@ let first_impact ray objs =
     | [] -> surface
     | obj :: objs ->
         begin match intersect ray (Texture.untextured obj) with
-        | Some ({ point = p; norm_vect = n } as impact) ->
-            let dist' = Vect.dist p ray.src in
+        | Some ({point} as impact) ->
+            let dist' = Vect.dist point ray.src in
             if dist' < dist then
               aux
                 ray dist' (Some (Texture.(textured (texture obj) impact))) objs
@@ -84,7 +84,7 @@ let first_impact ray objs =
   in
   aux ray infinity None objs
 
-let visible_light norm_v impact_pt objs light =
+let visible_light impact_pt objs light =
   first_impact { src = impact_pt; dir = Vect.opp light.Scene.l_dir } objs = None
 
 let weighted_sum compute_term lights =
@@ -101,7 +101,7 @@ let rec trace ray depth scene =
         let hj = Vect.normalised_diff (Vect.opp light.Scene.l_dir) ray.dir in
         Vect.scalprod n hj ** t.Texture.phong
       in
-      let visible_lights = List.filter (visible_light n p scene.Scene.objects)
+      let visible_lights = List.filter (visible_light p scene.Scene.objects)
           scene.Scene.lights in
       let k =
         t.Texture.kd *. (scene.Scene.ambient -.
