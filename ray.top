@@ -1,5 +1,3 @@
-#!ocaml -init
-
 #directory "_build/src";;
 #load "graphics.cma";;
 #load_rec "ray.cmo";;
