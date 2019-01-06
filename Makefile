@@ -1,22 +1,24 @@
-## Quelques possibilités d'options supplémentaires pour ocamlbuild:
-## -cflag -unsafe : pour accélerer les accès aux tableaux
-##                  une fois que le code fonctionne bien
-
 SHELL = /bin/sh
-
-OPTS = -use-ocamlfind -use-menhir -pkg graphics
+OCAMLBUILD = ocamlbuild -use-ocamlfind
+TARGET = ray
 
 .SUFFIXES:
-.PHONY: opt byte doc clean
+.PHONY: all opt byte repl doc clean
 
+all: opt
+
+# The tag unsafe is used to speed up array accesses.
 opt:
-	ocamlbuild $(OPTS) ray.native
+	$(OCAMLBUILD) -tag unsafe $(TARGET).native
 
 byte:
-	ocamlbuild $(OPTS) -tag debug ray.byte
+	$(OCAMLBUILD) -tag debug,bin_annot $(TARGET).byte
+
+repl: byte
+	rlwrap ocaml -init $(TARGET).top
 
 doc:
-	ocamlbuild ray.docdir/index.html
+	$(OCAMLBUILD) $(TARGET).docdir/index.html
 
 clean:
-	ocamlbuild -clean
+	$(OCAMLBUILD) -clean

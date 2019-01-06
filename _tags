@@ -1,4 +1,4 @@
+true: use_menhir, package(graphics)
 <src>: include
-
 not <**/parse.*>: warn(+a-9-41-42-44-45-48)
 <**/parse.*>: warn(+a-9-41-42-44-45-48-4)
