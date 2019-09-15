@@ -1,4 +1,4 @@
-#directory "_build/src";;
+#directory "_build/default/src/.ray.eobjs/byte";;
 #load "graphics.cma";;
 #load_rec "ray.cmo";;
 let () = print_string "Raytracing modules loaded.\n\n";;

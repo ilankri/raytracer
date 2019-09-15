@@ -1,0 +1,12 @@
+(env (_ (flags (:standard -w +a-4-9))))
+
+(ocamllex lex)
+
+(menhir
+ (modules parse)
+ (flags --explain --strict))
+
+(executable
+ (libraries graphics)
+ (modules_without_implementation scenario)
+ (name ray))

@@ -1,24 +1,20 @@
 SHELL = /bin/sh
-OCAMLBUILD = ocamlbuild -use-ocamlfind
+DUNE = dune
 TARGET = ray
 
 .SUFFIXES:
-.PHONY: all opt byte repl doc clean
+.PHONY: all opt byte repl clean
 
 all: opt
 
-# The tag unsafe is used to speed up array accesses.
 opt:
-	$(OCAMLBUILD) -tag unsafe $(TARGET).native
+	$(DUNE) build src/$(TARGET).exe
 
 byte:
-	$(OCAMLBUILD) -tag debug,bin_annot $(TARGET).byte
+	$(DUNE) build src/$(TARGET).bc
 
 repl: byte
 	rlwrap ocaml -init $(TARGET).top
 
-doc:
-	$(OCAMLBUILD) $(TARGET).docdir/index.html
-
 clean:
-	$(OCAMLBUILD) -clean
+	$(DUNE) clean
